@@ -75,7 +75,7 @@ func doFilterFx(arr []*model.Fx) bool {
 			if validFxValue(arr[this], arr[next]) {
 				switch validFxTime(arr[this], arr[next]) {
 				case 0:
-					this = -1
+					this = next
 					next = -1
 					continue
 				case 1:
