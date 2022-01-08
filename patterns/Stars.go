@@ -1,3 +1,10 @@
+/*
+ * @Date: 2022-01-08 22:03:33
+ * @LastEditors: Vscode
+ * @LastEditTime: 2022-01-08 22:57:59
+ * @Author: Keeyu
+ * @Github: https://github.com/keeYuc
+ */
 package patterns
 
 import (

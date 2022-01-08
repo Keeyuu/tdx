@@ -1,3 +1,10 @@
+/*
+ * @Date: 2022-01-08 22:03:33
+ * @LastEditors: Vscode
+ * @LastEditTime: 2022-01-08 23:22:02
+ * @Author: Keeyu
+ * @Github: https://github.com/keeYuc
+ */
 package model
 
 const (
@@ -25,7 +32,14 @@ type IndexRange struct {
 func (p *Pure) Contain(next *Pure) bool {
 	return p.H >= next.H && p.L <= next.H
 }
-
+func (p *Pure) CopyNew() *Pure {
+	return &Pure{
+		C:     p.C,
+		H:     p.H,
+		L:     p.H,
+		Range: p.Range,
+	}
+}
 func (p *Pure) CalcValueH() float32 {
 	return p.C*0.3 + p.H*0.7
 }

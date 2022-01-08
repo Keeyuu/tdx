@@ -1,10 +1,17 @@
+/*
+ * @Date: 2022-01-08 22:03:33
+ * @LastEditors: Vscode
+ * @LastEditTime: 2022-01-08 23:24:31
+ * @Author: Keeyu
+ * @Github: https://github.com/keeYuc
+ */
 package analyzer
 
 import "app/model"
 
 func Fx(arr []*model.Pure) []*model.Fx {
-	arr = contain(arr)
-	fx := findFx(arr)
+	arr_new := contain(arr)
+	fx := findFx(arr_new, arr)
 	return filterFx(fx)
 }
 
@@ -21,7 +28,7 @@ func contain(arr []*model.Pure) []*model.Pure {
 				cache = nil
 			}
 		} else {
-			cache = arr[i]
+			cache = arr[i].CopyNew()
 		}
 	}
 	if cache != nil {
@@ -30,7 +37,7 @@ func contain(arr []*model.Pure) []*model.Pure {
 	return arr_new
 }
 
-func findFx(arr []*model.Pure) []*model.Fx {
+func findFx(arr, arr_origin []*model.Pure) []*model.Fx {
 	long := len(arr)
 	arr_fx := make([]*model.Fx, 0, long/3)
 	for i := 1; i < long-1; i++ {
@@ -99,6 +106,15 @@ func checkH(last, this, next *model.Pure) bool {
 }
 func checkL(last, this, next *model.Pure) bool {
 	return this.L < last.L && this.L < next.L
+}
+
+func validFxType(this, next *model.Fx) bool {
+	if this.Type == next.Type {
+		if this.Type == model.H {
+
+		}
+	}
+	return false
 }
 
 func validFxValue(this, next *model.Fx) bool {
