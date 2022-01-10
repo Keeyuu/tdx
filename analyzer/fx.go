@@ -1,10 +1,3 @@
-/*
- * @Date: 2022-01-08 22:03:33
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-01-10 12:21:09
- * @Author: Keeyu
- * @Github: https://github.com/keeYuc
- */
 package analyzer
 
 import (
@@ -109,9 +102,9 @@ func checkValid(this, next int, arr_origin []*model.Pure) int {
 			return this
 		}
 	} else {
-		//if this == HIGH {
-		//}
-		// time check
+		if arr_origin[this].Range.R+SPECIAL_INDEX > arr_origin[next].Range.L {
+			return next
+		}
 	}
 	return VALID
 }
