@@ -1,18 +1,29 @@
 /*
  * @Date: 2022-01-08 22:03:33
- * @LastEditors: Vscode
- * @LastEditTime: 2022-01-08 23:24:31
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-10 12:21:09
  * @Author: Keeyu
  * @Github: https://github.com/keeYuc
  */
 package analyzer
 
-import "app/model"
+import (
+	"app/model"
+)
 
-func Fx(arr []*model.Pure) []*model.Fx {
+const (
+	LOW = iota - 1
+	NORMAL
+	HIGH
+	WAIT
+	VALID
+	SPECIAL_INDEX = 3
+)
+
+func Fx(arr []*model.Pure) []int {
 	arr_new := contain(arr)
 	fx := findFx(arr_new, arr)
-	return filterFx(fx)
+	return filterFx(fx, arr)
 }
 
 func contain(arr []*model.Pure) []*model.Pure {
@@ -37,98 +48,109 @@ func contain(arr []*model.Pure) []*model.Pure {
 	return arr_new
 }
 
-func findFx(arr, arr_origin []*model.Pure) []*model.Fx {
+func findFx(arr, arr_origin []*model.Pure) []int {
 	long := len(arr)
-	arr_fx := make([]*model.Fx, 0, long/3)
+	arr_fx := make([]int, long)
 	for i := 1; i < long-1; i++ {
-		if checkH(arr[i-1], arr[i], arr[i+1]) {
-			arr_fx = append(arr_fx, &model.Fx{K: *arr[i], Type: model.H})
+		if checkHigh(arr[i-1], arr[i], arr[i+1]) && isSpecialHigh(arr[i], arr_origin) {
+			arr_fx[i] = HIGH
 		}
-		if checkL(arr[i-1], arr[i], arr[i+1]) {
-			arr_fx = append(arr_fx, &model.Fx{K: *arr[i], Type: model.L})
+		if checkLow(arr[i-1], arr[i], arr[i+1]) && isSpecialLow(arr[i], arr_origin) {
+			arr_fx[i] = LOW
 		}
 	}
 	return arr_fx
 }
 
-func filterFx(arr []*model.Fx) []*model.Fx {
-	validFx := make([]*model.Fx, 0, len(arr)/2)
+func filterFx(arr []int, arr_origin []*model.Pure) []int {
 	for {
-		if doFilterFx(arr) {
+		if doFilterFx(arr, arr_origin) {
 			break
 		}
 	}
-	for _, item := range arr {
-		if item != nil {
-			validFx = append(validFx, item)
-		}
-	}
-	return validFx
+	return arr
 }
 
-func doFilterFx(arr []*model.Fx) bool {
-	this, next := -1, -1
+func doFilterFx(arr []int, arr_origin []*model.Pure) bool {
+	this, next := WAIT, WAIT
 	for i := 0; i < len(arr); i++ {
-		if arr[i] != nil {
-			if this == -1 {
-				this = i
-			} else if next != -1 {
-				next = i
-			} else {
-				panic("this and next both != -1")
+		if this != WAIT && next != WAIT {
+			if index := checkValid(this, next, arr_origin); index != VALID {
+				arr[index] = NORMAL
+				return false
 			}
+			this = next
+			next = WAIT
 		}
-		if this != -1 && next != -1 {
-			if validFxValue(arr[this], arr[next]) {
-				switch validFxTime(arr[this], arr[next]) {
-				case 0:
-					this = next
-					next = -1
-					continue
-				case 1:
-					arr[this] = nil
-				case -1:
-					arr[next] = nil
-				}
-				return false //一旦时间维度出现问题需要全部出现计算,因为时间的错误会蔓延
+		if arr[i] != NORMAL {
+			if this == WAIT {
+				this = arr[i]
+			} else if next == WAIT {
+				next = arr[i]
 			} else {
-				arr[this] = nil
-				this = next
-				next = -1
+				panic("err")
 			}
 		}
 	}
 	return true
 }
 
-func checkH(last, this, next *model.Pure) bool {
-	return this.H > last.H && this.H > next.H
-}
-func checkL(last, this, next *model.Pure) bool {
-	return this.L < last.L && this.L < next.L
+func checkValid(this, next int, arr_origin []*model.Pure) int {
+	if this == next {
+		if this == HIGH {
+			if arr_origin[this].CalcValueHigh() >= arr_origin[next].CalcValueHigh() {
+				return next
+			}
+			return this
+		} else {
+			if arr_origin[this].CalcValueLow() <= arr_origin[next].CalcValueLow() {
+				return next
+			}
+			return this
+		}
+	} else {
+		//if this == HIGH {
+		//}
+		// time check
+	}
+	return VALID
 }
 
-func validFxType(this, next *model.Fx) bool {
-	if this.Type == next.Type {
-		if this.Type == model.H {
+func checkHigh(last, this, next *model.Pure) bool {
+	return this.CalcValueHigh() > last.CalcValueHigh() && this.CalcValueHigh() > next.CalcValueHigh()
+}
+func checkLow(last, this, next *model.Pure) bool {
+	return this.CalcValueLow() < last.CalcValueLow() && this.CalcValueLow() < next.CalcValueLow()
+}
 
+func isSpecialHigh(this *model.Pure, arr []*model.Pure) bool {
+	left, right := this.Range.L-SPECIAL_INDEX, this.Range.L+SPECIAL_INDEX
+	if left < 0 {
+		left = 0
+	}
+	if right > len(arr)-1 {
+		right = len(arr) - 1
+	}
+	for i := left; i <= right; i++ {
+		if arr[i].CalcValueHigh() > this.CalcValueHigh() {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
-func validFxValue(this, next *model.Fx) bool {
-	switch this.Type {
-	case model.H:
-		return this.K.CalcValueH() > next.K.CalcValueH()
-	case model.L:
-		return this.K.CalcValueL() < next.K.CalcValueL()
-	default:
-		panic("type err")
+func isSpecialLow(this *model.Pure, arr []*model.Pure) bool {
+	left, right := this.Range.L-SPECIAL_INDEX, this.Range.L+SPECIAL_INDEX
+	if left < 0 {
+		left = 0
 	}
-}
-
-func validFxTime(this, next *model.Fx) int {
-	// todo
-	return 0
+	if right > len(arr)-1 {
+		right = len(arr) - 1
+	}
+	for i := left; i <= right; i++ {
+		if arr[i].CalcValueLow() < this.CalcValueLow() {
+			return false
+		}
+	}
+	return true
 }

@@ -1,15 +1,17 @@
 /*
  * @Date: 2022-01-08 22:03:33
- * @LastEditors: Vscode
- * @LastEditTime: 2022-01-08 23:22:02
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-10 12:19:08
  * @Author: Keeyu
  * @Github: https://github.com/keeYuc
  */
 package model
 
 const (
-	H = "H"
-	L = "L"
+	H              = "H"
+	L              = "L"
+	SPECIAL_WEIGHT = 0.8
+	NORMAL_WEIGHT  = 1 - SPECIAL_WEIGHT
 )
 
 type Fx struct {
@@ -40,11 +42,11 @@ func (p *Pure) CopyNew() *Pure {
 		Range: p.Range,
 	}
 }
-func (p *Pure) CalcValueH() float32 {
-	return p.C*0.3 + p.H*0.7
+func (p *Pure) CalcValueHigh() float32 {
+	return p.C*NORMAL_WEIGHT + p.H*SPECIAL_WEIGHT
 }
-func (p *Pure) CalcValueL() float32 {
-	return p.C*0.3 + p.L*0.7
+func (p *Pure) CalcValueLow() float32 {
+	return p.C*NORMAL_WEIGHT + p.L*SPECIAL_WEIGHT
 }
 
 type Tdx struct {

@@ -100,3 +100,20 @@ func Test_Slice(t *testing.T) {
 		t.Error(arr)
 	}
 }
+
+const (
+	a = iota - 1
+	b
+	c
+	x = 100
+)
+
+func Test_Slice2(t *testing.T) {
+	arr := make([]int, 10)
+	arr[1] = 77
+	t.Error(arr)
+	t.Error(x)
+	t.Error(a)
+	t.Error(b)
+	t.Error(c)
+}
