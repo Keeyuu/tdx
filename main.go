@@ -25,6 +25,7 @@ package main
 
 import (
 	"C"
+	"unsafe"
 )
 import (
 	"app/analyzer"
@@ -63,12 +64,33 @@ func ThreeStars(dataLen int, a, b, c []float32) (float32, int32) {
 }
 
 //export FindFx
-func FindFx(dataLen int, a, b, c, d []float32) {
-	if dataLen < 5 {
+func FindFx(dataLen int, a, b, c, d unsafe.Pointer) {
+	if dataLen <= 3 {
 		return
 	}
-	tdx := model.ExchangePure(dataLen, a, b, c)
-	for k, v := range analyzer.Fx(tdx) {
-		d[k] = float32(v)
+	tdx := ExchangePure(dataLen, a, b, c)
+	c_d := (*[1 << 28]C.float)(d)
+	for i := 0; i < dataLen; i++ {
+		c_d[i] = C.float(0)
 	}
+	for k, v := range analyzer.Fx(tdx) {
+		c_d[k] = C.float(v)
+	}
+}
+
+func ExchangePure(dataLen int, a, b, c unsafe.Pointer) []*model.Pure {
+	c_a := (*[1 << 28]C.float)(a)
+	c_b := (*[1 << 28]C.float)(b)
+	c_c := (*[1 << 28]C.float)(c)
+	arr := make([]*model.Pure, 0, dataLen)
+	for i := 0; i < dataLen; i++ {
+		item := new(model.Pure)
+		item.C = float32(c_a[i])
+		item.H = float32(c_b[i])
+		item.L = float32(c_c[i])
+		item.Range.L = i
+		item.Range.R = i
+		arr = append(arr, item)
+	}
+	return arr
 }

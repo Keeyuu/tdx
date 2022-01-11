@@ -11,7 +11,7 @@
 #define GO_CGO_EXPORT_PROLOGUE_H
 
 #ifndef GO_CGO_GOSTRING_TYPEDEF
-typedef struct { const char* p; ptrdiff_t n; } _GoString_;
+typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 #endif
 
 #endif
@@ -50,15 +50,15 @@ typedef double GoFloat64;
   static assertion to make sure the file is being used on architecture
   at least with matching size of GoInt.
 */
-typedef char _check_for_32_bit_pointer_matching_GoInt[sizeof(void*) == 32 / 8 ? 1 : -1];
+typedef char _check_for_32_bit_pointer_matching_GoInt[sizeof(void*)==32/8 ? 1:-1];
 
 #ifndef GO_CGO_GOSTRING_TYPEDEF
 typedef _GoString_ GoString;
 #endif
-typedef void* GoMap;
-typedef void* GoChan;
-typedef struct { void* t; void* v; } GoInterface;
-typedef struct { void* data; GoInt len; GoInt cap; } GoSlice;
+typedef void *GoMap;
+typedef void *GoChan;
+typedef struct { void *t; void *v; } GoInterface;
+typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 
 #endif
 
@@ -69,30 +69,27 @@ extern "C" {
 #endif
 
 
-    /* Return type for SingleStar */
-    struct SingleStar_return
-    {
-        GoFloat32 r0;
-        GoInt32 r1;
-    };
-    extern __declspec(dllexport) struct SingleStar_return SingleStar(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
+/* Return type for SingleStar */
+struct SingleStar_return {
+	GoFloat32 r0;
+	GoInt32 r1;
+};
+extern __declspec(dllexport) struct SingleStar_return SingleStar(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
 
-    /* Return type for DoubleStars */
-    struct DoubleStars_return
-    {
-        GoFloat32 r0;
-        GoInt32 r1;
-    };
-    extern __declspec(dllexport) struct DoubleStars_return DoubleStars(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
+/* Return type for DoubleStars */
+struct DoubleStars_return {
+	GoFloat32 r0;
+	GoInt32 r1;
+};
+extern __declspec(dllexport) struct DoubleStars_return DoubleStars(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
 
-    /* Return type for ThreeStars */
-    struct ThreeStars_return
-    {
-        GoFloat32 r0;
-        GoInt32 r1;
-    };
-    extern __declspec(dllexport) struct ThreeStars_return ThreeStars(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
-    extern __declspec(dllexport) void FindFx(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c, GoSlice d);
+/* Return type for ThreeStars */
+struct ThreeStars_return {
+	GoFloat32 r0;
+	GoInt32 r1;
+};
+extern __declspec(dllexport) struct ThreeStars_return ThreeStars(GoInt dataLen, GoSlice a, GoSlice b, GoSlice c);
+extern __declspec(dllexport) void FindFx(GoInt dataLen, void* a, void* b, void* c, void* d);
 
 #ifdef __cplusplus
 }

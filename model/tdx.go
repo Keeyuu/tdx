@@ -32,7 +32,7 @@ type IndexRange struct {
 }
 
 func (p *Pure) Contain(next *Pure) bool {
-	return p.H >= next.H && p.L <= next.H
+	return p.H >= next.H && p.L <= next.L
 }
 func (p *Pure) CopyNew() *Pure {
 	return &Pure{

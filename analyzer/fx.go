@@ -8,8 +8,10 @@ const (
 	LOW = iota - 1
 	NORMAL
 	HIGH
-	WAIT
-	VALID
+	VALID         = -888
+	WAIT          = -999
+	THIS          = -777
+	NEXT          = -666
 	SPECIAL_INDEX = 3
 )
 
@@ -29,7 +31,7 @@ func contain(arr []*model.Pure) []*model.Pure {
 				cache.Range.R = arr[i].Range.R
 			} else {
 				arr_new = append(arr_new, cache)
-				cache = nil
+				cache = arr[i].CopyNew()
 			}
 		} else {
 			cache = arr[i].CopyNew()
@@ -45,10 +47,10 @@ func findFx(arr, arr_origin []*model.Pure) []int {
 	arr_fx := make([]int, len(arr_origin))
 	for i := 1; i < len(arr)-1; i++ {
 		if checkHigh(arr[i-1], arr[i], arr[i+1]) && isSpecialHigh(arr[i], arr_origin) {
-			arr_fx[i] = HIGH
+			arr_fx[arr[i].Range.L] = HIGH
 		}
 		if checkLow(arr[i-1], arr[i], arr[i+1]) && isSpecialLow(arr[i], arr_origin) {
-			arr_fx[i] = LOW
+			arr_fx[arr[i].Range.L] = LOW
 		}
 	}
 	return arr_fx
@@ -67,8 +69,12 @@ func doFilterFx(arr []int, arr_origin []*model.Pure) bool {
 	this, next := WAIT, WAIT
 	for i := 0; i < len(arr); i++ {
 		if this != WAIT && next != WAIT {
-			if index := checkValid(this, next, arr_origin); index != VALID {
-				arr[index] = NORMAL
+			if index := checkValid(arr[this], arr[next], arr_origin[this], arr_origin[next]); index != VALID {
+				if index == THIS {
+					arr[this] = NORMAL
+				} else {
+					arr[next] = NORMAL
+				}
 				return false
 			}
 			this = next
@@ -76,9 +82,9 @@ func doFilterFx(arr []int, arr_origin []*model.Pure) bool {
 		}
 		if arr[i] != NORMAL {
 			if this == WAIT {
-				this = arr[i]
+				this = i
 			} else if next == WAIT {
-				next = arr[i]
+				next = i
 			} else {
 				panic("err")
 			}
@@ -87,22 +93,22 @@ func doFilterFx(arr []int, arr_origin []*model.Pure) bool {
 	return true
 }
 
-func checkValid(this, next int, arr_origin []*model.Pure) int {
+func checkValid(this, next int, thisItem, nextItem *model.Pure) int {
 	if this == next {
 		if this == HIGH {
-			if arr_origin[this].CalcValueHigh() >= arr_origin[next].CalcValueHigh() {
-				return next
+			if thisItem.CalcValueHigh() >= nextItem.CalcValueHigh() {
+				return NEXT
 			}
-			return this
+			return THIS
 		} else {
-			if arr_origin[this].CalcValueLow() <= arr_origin[next].CalcValueLow() {
-				return next
+			if thisItem.CalcValueLow() <= nextItem.CalcValueLow() {
+				return NEXT
 			}
-			return this
+			return THIS
 		}
 	} else {
-		if arr_origin[this].Range.R+SPECIAL_INDEX > arr_origin[next].Range.L {
-			return next
+		if thisItem.Range.R+SPECIAL_INDEX > nextItem.Range.L {
+			return NEXT
 		}
 	}
 	return VALID
