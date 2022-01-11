@@ -67,7 +67,7 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
     {1, (pPluginFUNC) &SingleStarPatter},
     {2, (pPluginFUNC) &DoubleStarsPatter},
     {3, (pPluginFUNC) &ThreeStarsPatter},
-    {5, (pPluginFUNC) &FindFxPatter}
+    {5, (pPluginFUNC) &FindFxPatter},
     {0, NULL},
 };
 

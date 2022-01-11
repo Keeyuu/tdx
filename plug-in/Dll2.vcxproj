@@ -91,7 +91,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>C:\Users\52500\code\other\tdx\plug-in\src;$(SourcePath)</SourcePath>
-    <LibraryPath>C:\Users\52500\code\other\tdx\plug-in\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>./lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>./src/include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
