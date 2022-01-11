@@ -1,11 +1,4 @@
 /*
- * @Date: 2022-01-08 22:03:33
- * @LastEditors: Vscode
- * @LastEditTime: 2022-01-08 22:58:30
- * @Author: Keeyu
- * @Github: https://github.com/keeYuc
- */
-/*
  *                                                     __----~~~~~~~~~~~------___
  *                                    .  .   ~~//====......          __--~ ~~
  *                    -.            \_|//     |||\\  ~~~~~~::::... /~
@@ -34,6 +27,7 @@ import (
 	"C"
 )
 import (
+	"app/analyzer"
 	"app/model"
 	"app/patterns"
 )
@@ -66,4 +60,15 @@ func ThreeStars(dataLen int, a, b, c []float32) (float32, int32) {
 	}
 	tdx := model.Exchange(dataLen, a, b, c)
 	return patterns.ThreeStars(&tdx)
+}
+
+//export FindFx
+func FindFx(dataLen int, a, b, c, d []float32) {
+	if dataLen < 5 {
+		return
+	}
+	tdx := model.ExchangePure(dataLen, a, b, c)
+	for k, v := range analyzer.Fx(tdx) {
+		d[k] = float32(v)
+	}
 }

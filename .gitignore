@@ -1,1 +1,7 @@
 build
+.a
+.def
+.dll.a
+.exp
+.h
+.lib

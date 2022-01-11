@@ -42,9 +42,8 @@ func contain(arr []*model.Pure) []*model.Pure {
 }
 
 func findFx(arr, arr_origin []*model.Pure) []int {
-	long := len(arr)
-	arr_fx := make([]int, long)
-	for i := 1; i < long-1; i++ {
+	arr_fx := make([]int, len(arr_origin))
+	for i := 1; i < len(arr)-1; i++ {
 		if checkHigh(arr[i-1], arr[i], arr[i+1]) && isSpecialHigh(arr[i], arr_origin) {
 			arr_fx[i] = HIGH
 		}

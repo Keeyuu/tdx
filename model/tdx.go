@@ -74,6 +74,7 @@ func ExchangePure(dataLen int, a, b, c []float32) []*Pure {
 		item.L = c[i]
 		item.Range.L = i
 		item.Range.R = i
+		arr = append(arr, item)
 	}
 	return arr
 }
