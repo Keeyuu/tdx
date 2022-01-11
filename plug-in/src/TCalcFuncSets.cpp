@@ -2,27 +2,22 @@
 #include "TCalcFuncSets.h"
 #include "plug.h"
 #include<iostream>
-//生成的dll及相关依赖dll请拷贝到通达信安装目录的T0002/dlls/下面,再在公式管理器进行绑定
 
 
-
-
-//双星模式
-void SingleStar(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
+GoSlice BuildGoSlice(int len, void* data)
 {
-    auto a = new GoSlice;
-    a->len = DataLen;
-    a->cap = DataLen;
-    a->data = pfINa;
-    auto b = new GoSlice;
-    b->len = DataLen;
-    b->cap = DataLen;
-    b->data = pfINb;
-    auto c = new GoSlice;
-    c->len = DataLen;
-    c->cap = DataLen;
-    c->data = pfINc;
-    auto flag = SingleStar(DataLen, *a, *b, *c);
+    auto item = new GoSlice;
+    item->len = len;
+    item->cap = len;
+    item->data = data;
+    return *item;
+}
+
+
+
+void SingleStarPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
+{
+    auto flag = SingleStar(DataLen, BuildGoSlice(DataLen, pfINa), BuildGoSlice(DataLen, pfINb), BuildGoSlice(DataLen, pfINc));
     for (int i = 0; i < DataLen; i++)
     {
         pfOUT[i] = flag.r0;
@@ -33,21 +28,9 @@ void SingleStar(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pf
     }
 }
 
-void DoubleStars(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
+void DoubleStarsPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
-    auto a = new GoSlice;
-    a->len = DataLen;
-    a->cap = DataLen;
-    a->data = pfINa;
-    auto b = new GoSlice;
-    b->len = DataLen;
-    b->cap = DataLen;
-    b->data = pfINb;
-    auto c = new GoSlice;
-    c->len = DataLen;
-    c->cap = DataLen;
-    c->data = pfINc;
-    auto flag = DoubleStars(DataLen, *a, *b, *c);
+    auto flag = DoubleStars(DataLen, BuildGoSlice(DataLen, pfINa), BuildGoSlice(DataLen, pfINb), BuildGoSlice(DataLen, pfINc));
     for (int i = 0; i < DataLen; i++)
     {
         pfOUT[i] = flag.r0;
@@ -59,23 +42,9 @@ void DoubleStars(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* p
 }
 
 
-// 三星模式
-
-void ThreeStars(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
+void ThreeStarsPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
-    auto a = new GoSlice;
-    a->len = DataLen;
-    a->cap = DataLen;
-    a->data = pfINa;
-    auto b = new GoSlice;
-    b->len = DataLen;
-    b->cap = DataLen;
-    b->data = pfINb;
-    auto c = new GoSlice;
-    c->len = DataLen;
-    c->cap = DataLen;
-    c->data = pfINc;
-    auto flag = ThreeStars(DataLen, *a, *b, *c);
+    auto flag = ThreeStars(DataLen, BuildGoSlice(DataLen, pfINa), BuildGoSlice(DataLen, pfINb), BuildGoSlice(DataLen, pfINc));
     for (int i = 0; i < DataLen; i++)
     {
         pfOUT[i] = flag.r0;
@@ -88,16 +57,14 @@ void ThreeStars(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pf
 
 
 
-//加载的函数
 PluginTCalcFuncInfo g_CalcFuncSets[] =
 {
-    {1, (pPluginFUNC) &SingleStar},
-    {2, (pPluginFUNC) &DoubleStars},
-    {3, (pPluginFUNC) &ThreeStars},
+    {1, (pPluginFUNC) &SingleStarPatter},
+    {2, (pPluginFUNC) &DoubleStarsPatter},
+    {3, (pPluginFUNC) &ThreeStarsPatter},
     {0, NULL},
 };
 
-//导出给TCalc的注册函数
 BOOL RegisterTdxFunc(PluginTCalcFuncInfo** pFun)
 {
     if (*pFun == NULL)
@@ -108,8 +75,3 @@ BOOL RegisterTdxFunc(PluginTCalcFuncInfo** pFun)
     return FALSE;
 }
 
-
-void test()
-{
-    std::cout << "yes" << std::endl;
-}
