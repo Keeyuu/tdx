@@ -10,7 +10,7 @@ package model
 const (
 	H              = "H"
 	L              = "L"
-	SPECIAL_WEIGHT = 0.8
+	SPECIAL_WEIGHT = 0.7
 	NORMAL_WEIGHT  = 1 - SPECIAL_WEIGHT
 )
 
@@ -38,7 +38,7 @@ func (p *Pure) CopyNew() *Pure {
 	return &Pure{
 		C:     p.C,
 		H:     p.H,
-		L:     p.H,
+		L:     p.L,
 		Range: p.Range,
 	}
 }
