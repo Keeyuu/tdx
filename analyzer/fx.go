@@ -152,3 +152,7 @@ func isSpecialLow(this *model.Pure, arr []*model.Pure) bool {
 	}
 	return true
 }
+
+func checkBiThree(arr []int, arr_origin []*model.Pure) bool
+
+func checkBiThreeLine(arr []int, arr_origin []*model.Pure) bool

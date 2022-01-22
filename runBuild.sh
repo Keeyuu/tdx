@@ -5,10 +5,13 @@
  # @Author: Keeyu
  # @Github: https://github.com/keeYuc
 ###
-#! /usr/bin/bash
+go="/c/golang/bin/go"
+
 CLPATH=`pwd`/build
 NAME="plug"
-CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -buildmode=c-archive -o $NAME.a
+
+
+CGO_ENABLED=1 GOOS=windows GOARCH=386 $go build -buildmode=c-archive -o $NAME.a
 #rm $CLPATH/*.lib
 #rm $CLPATH/*dll.a
 #rm $CLPATH/*.a
