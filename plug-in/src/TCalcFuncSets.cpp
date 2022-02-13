@@ -59,22 +59,21 @@ void ThreeStarsPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, flo
 void FindFxPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
     int* p = new int[DataLen];
-    FindFx(DataLen,  pfINa, pfINb,  pfINc,p);
+    FindFx(DataLen, pfINa, pfINb, pfINc, p);
     for (int i = 0; i < DataLen; i++)
     {
         if (p[i] > 0)
         {
             pfOUT[i] = 1;
-        }
-        else if (p[i] < 0)
+        } else if (p[i] < 0)
         {
             pfOUT[i] = -1;
-        }
-        else {
+        } else
+        {
             pfOUT[i] = 0;
         };
-      
-   }
+
+    }
     delete p;
 }
 
