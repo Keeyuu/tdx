@@ -1,7 +1,7 @@
 #ifndef __TCALC_FUNC_SETS
 #define __TCALC_FUNC_SETS
 #include "PluginTCalcFunc.h"
-
+#include"pch.h"
 
 
 
