@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\analyser.hpp" />
+    <ClCompile Include="src\analyser.cpp" />
     <ClCompile Include="src\dllmain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -27,6 +27,7 @@
     <ClCompile Include="src\TCalcFuncSets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\analyser.h" />
     <ClInclude Include="include\framework.h" />
     <ClInclude Include="include\pch.h" />
     <ClInclude Include="include\PluginTCalcFunc.h" />

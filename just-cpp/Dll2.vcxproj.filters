@@ -23,7 +23,7 @@
     <ClCompile Include="src\TCalcFuncSets.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\analyser.hpp">
+    <ClCompile Include="src\analyser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,6 +38,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\TCalcFuncSets.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\analyser.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

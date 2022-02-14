@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "TCalcFuncSets.h"
-#include"analyser.hpp"
 
 
 void SingleStarPatter(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
@@ -42,9 +41,8 @@ BOOL RegisterTdxFunc(PluginTCalcFuncInfo** pFun)
 }
 
 
-#include<vector>
+#include"analyser.h"
 void Debug()
 {
 	std::cout << "start debug" << std::endl;
-	auto p = new vectot<KLine>;
 }
