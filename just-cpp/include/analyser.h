@@ -1,30 +1,39 @@
-#include"pch.h"
-#include<iostream>
-#include<cmath>
-#include<vector>
+#pragma once
+#include<algorithm>
+#ifndef ANALYSER_H
+#define ANALYSER_H
 
 typedef enum :int { NORMAL, TOP, LOW }FxType;
-typedef  std::vector<KLine>::iterator KIter;
-typedef std::vector<KLine> SequenceK;
-typedef std::vector<int> SequenceT;
+const float SPECIAL = 0.7;
+
 class KLine
 {
-    float close;
-    float specialLow;
-    float specialHigh;
-    bool isSpecialHigh(KIter, KIter);
-    bool isSpecialLow(KIter, KIter);
+	float close;
+	float specialLow;
+	float specialHigh;
+	int specialInterval = 3;
+	bool isSpecialHigh(KLine**, int, int);
+	bool isSpecialLow(KLine**, int, int);
 public:
-    void reset(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
-    FxType checkFx(KIter, KIter);
-    bool vaildFx(KIter);
+	KLine(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
+	void reset(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
+	FxType checkFx(KLine**, int, int);
+	bool vaildFx(KLine*);
+	float getHighValue() { return close * (1 - SPECIAL) + specialHigh * SPECIAL; }
+	float getLowValue() { return close * (1 - SPECIAL) + specialLow * SPECIAL; }
 };
 
 class PriceAnalyser
 {
-    SequenceK* KLines;
-    SequenceT* types;
-    PriceAnalyser(int, float*, float*, float*);
-    void findFx();
+	KLine** kLines;
+	int* kTypes;
+	int dataLen;
+	void findFx();
+	void checkFx();
 public:
+	void show();
+	PriceAnalyser(int, float*, float*, float*);
+	~PriceAnalyser();
 };
+
+#endif

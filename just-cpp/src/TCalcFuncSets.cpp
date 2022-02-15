@@ -42,7 +42,14 @@ BOOL RegisterTdxFunc(PluginTCalcFuncInfo** pFun)
 
 
 #include"analyser.h"
+#include<iostream>
 void Debug()
 {
+	int max = 13;
 	std::cout << "start debug" << std::endl;
+	float* p = new float[max] { 1, 1, 3, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2 };
+	auto x = PriceAnalyser(max, p, p, p);
+	x.show();
+
+	std::cout << "end debug" << std::endl;
 }
