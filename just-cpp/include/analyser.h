@@ -18,7 +18,7 @@ public:
 	KLine(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
 	void reset(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
 	FxType checkFx(KLine**, int, int);
-	bool vaildFx(KLine*);
+	bool vaildFx(KLine*, FxType);
 	float getHighValue() { return close * (1 - SPECIAL) + specialHigh * SPECIAL; }
 	float getLowValue() { return close * (1 - SPECIAL) + specialLow * SPECIAL; }
 };
@@ -26,7 +26,7 @@ public:
 class PriceAnalyser
 {
 	KLine** kLines;
-	int* kTypes;
+	FxType* kTypes;
 	int dataLen;
 	void findFx();
 	void checkFx();

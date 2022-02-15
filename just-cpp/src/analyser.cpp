@@ -12,11 +12,12 @@ FxType KLine::checkFx(KLine** items, int cursor, int dataLen)
 	return FxType(type);
 }
 
-//bool  KLine::vaildFx(KLineItor& last)
-//{
-//	return false;
-//}
-//
+bool  KLine::vaildFx(KLine* last, FxType lastType)
+{
+	//todo
+	return true;
+}
+
 bool KLine::isSpecialHigh(KLine** items, int cursor, int dataLen)
 {
 	int left = 0, right = dataLen;
@@ -43,13 +44,14 @@ PriceAnalyser::PriceAnalyser(int dataLen, float* inA, float* inB, float* inC)
 {
 	if (dataLen < 6)return;
 	this->kLines = new KLine * [dataLen];
-	this->kTypes = new int[dataLen]; this->kTypes[0] = 0; this->kTypes[dataLen - 1] = 0;
+	this->kTypes = new FxType[dataLen]; this->kTypes[0] = FxType::NORMAL; this->kTypes[dataLen - 1] = FxType::NORMAL;
 	this->dataLen = dataLen;
 	for (int i = 0; i < dataLen; i++)
 	{
 		this->kLines[i] = new KLine(inA[i], inB[i], inC[i]);
 	}
 	this->findFx();
+	this->checkFx();
 }
 
 PriceAnalyser::~PriceAnalyser()
@@ -72,7 +74,25 @@ void PriceAnalyser::findFx()
 
 void PriceAnalyser::checkFx()
 {
-
+	FxType lastType = FxType::NORMAL;
+	int lastIndex = 0;
+	for (int i = 0; i < this->dataLen; i++) {
+		if (this->kTypes[i] != FxType::NORMAL) {
+			if (lastType == FxType::NORMAL) {
+				lastType = this->kTypes[i];
+				lastIndex = i;
+			}
+			else {
+				if (this->kLines[i]->vaildFx(this->kLines[lastIndex], lastType)) {
+					lastType = this->kTypes[i];
+					lastIndex = i;
+				}
+				else {
+					this->kTypes[i] = FxType::NORMAL;
+				}
+			}
+		}
+	}
 }
 
 void PriceAnalyser::show()
