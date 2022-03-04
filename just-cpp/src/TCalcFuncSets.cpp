@@ -4,21 +4,21 @@
 // a: diff ma5 b: open c: close
 void OverfulfilPatter(int dataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
-	if (dataLen < 1)return;
-	int days = 15;
-	float flag = -9;
-	float sumDiffMa = 0.0, firstMa = 0.0, maxLimit = 0.01 * 10;
-	for (int i = 0; i < dataLen; i++) sumDiffMa += pfINa[i];
-	if (sumDiffMa / firstMa >= maxLimit) flag = 1;//最大均线差异幅度
-	if (isSpecialHigh(dataLen, pfINc, dataLen, days)) {
-		//todo 跳空
-		//todo 扎空棒
-	}
-	if (true);//todo 强轧空
-	if (true);//todo 一星
-	if (true);//todo 二星
-	if (true);//todo 三星
-	for (int i = 0; i < dataLen; i++) pfOUT[i] = flag;
+	//if (dataLen < 1)return;
+	//int days = 15;
+	//float flag = -9;
+	//float sumDiffMa = 0.0, firstMa = 0.0, maxLimit = 0.01 * 10;
+	//for (int i = 0; i < dataLen; i++) sumDiffMa += pfINa[i];
+	//if (sumDiffMa / firstMa >= maxLimit) flag = 1;//最大均线差异幅度
+	//if (isSpecialHigh(dataLen, pfINc, dataLen, days)) {
+	//	//todo 跳空
+	//	//todo 扎空棒
+	//}
+	//if (true);//todo 强轧空
+	//if (true);//todo 一星
+	//if (true);//todo 二星
+	//if (true);//todo 三星
+	//for (int i = 0; i < dataLen; i++) pfOUT[i] = flag;
 }
 
 

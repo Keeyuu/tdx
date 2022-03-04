@@ -3,39 +3,36 @@
 #ifndef ANALYSER_H
 #define ANALYSER_H
 
-typedef enum :int { NORMAL, TOP, LOW }FxType;
-const float SPECIAL = 0.7;
+typedef enum :int { NORMAL, TOP, LOW = -1 }FxType;
 
 class KLine
 {
-    float open;
-    float close;
-    float special; // 红取高 黑取低
-    float specialLow;
-    float specialHigh;
-    int specialInterval = 3;
-    bool isSpecialHigh(KLine**, int, int);
-    bool isSpecialLow(KLine**, int, int);
+	float open;
+	float close;
+	float diffMa;
+	int specialInterval = 3;
+	bool isSpecialHigh(KLine**, int, int);
+	bool isSpecialLow(KLine**, int, int);
 public:
-    KLine(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
-    void reset(float inA, float inB, float inC) { close = inA, specialLow = inB, specialHigh = inC; };
-    FxType checkFx(KLine**, int, int);
-    bool vaildFx(KLine*, FxType);
-    float getHighValue() { return close * (1 - SPECIAL) + specialHigh * SPECIAL; }
-    float getLowValue() { return close * (1 - SPECIAL) + specialLow * SPECIAL; }
+	KLine(float inA, float inB, float inC) { open = inA, close = inB, diffMa = inC; };
+	void reset(float inA, float inB, float inC) { open = inA, close = inB, diffMa = inC; };
+	FxType checkFx(KLine**, int, int);
+	bool vaildFx(KLine*, FxType, FxType);
+	float getClose() { return close; }
 };
 
 class PriceAnalyser
 {
-    KLine** kLines;
-    FxType* kTypes;
-    int dataLen;
-    void findFx();
-    void checkFx();
+	KLine** kLines;
+	FxType* kTypes;
+	int dataLen;
+	void findFx();
+	void checkFx();
 public:
-    void show();
-    PriceAnalyser(int, float*, float*, float*);
-    ~PriceAnalyser();
+	float calcDiff(int, int);
+	void show();
+	PriceAnalyser(int, float*, float*, float*);
+	~PriceAnalyser();
 };
 
 #endif

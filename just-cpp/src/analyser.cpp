@@ -5,18 +5,26 @@
 FxType KLine::checkFx(KLine** items, int cursor, int dataLen)
 {
 	auto last = items[cursor - 1], now = items[cursor], next = items[cursor + 1];
-	int type = NORMAL;
-	if (this->specialHigh > last->specialHigh && this->specialHigh > next->specialHigh && this->isSpecialHigh(items, cursor, dataLen))  type = TOP;
-	if (this->specialLow < last->specialLow && this->specialLow < next->specialLow && this->isSpecialLow(items, cursor, dataLen)) type += LOW;
-	if (type >= FxType::LOW + FxType::TOP) type = fabs(this->specialLow - this->close) > fabs(this->specialHigh - this->close) ? LOW : TOP;
-	return FxType(type);
+	FxType type = NORMAL;
+	if (this->close > last->close && this->close > next->close && this->isSpecialHigh(items, cursor, dataLen))  type = TOP;
+	else if (this->close < last->close && this->close < next->close && this->isSpecialLow(items, cursor, dataLen)) type = LOW;
+	return type;
 }
 
-bool  KLine::vaildFx(KLine* last, FxType lastType)
+bool  KLine::vaildFx(KLine* last, FxType lastType, FxType thisType)
 {
-	//todo
-	return true;
+	bool flag = true;
+	switch (lastType)
+	{
+	case TOP:
+		if (thisType == LOW)flag = this->close < last->close;
+	case LOW:
+		if (thisType == TOP)flag = this->close > last->close;
+	}
+	if (lastType == thisType)flag = false;
+	return flag;
 }
+
 
 bool KLine::isSpecialHigh(KLine** items, int cursor, int dataLen)
 {
@@ -24,7 +32,7 @@ bool KLine::isSpecialHigh(KLine** items, int cursor, int dataLen)
 	if (cursor + this->specialInterval < dataLen)right = cursor + this->specialInterval;
 	if (cursor - this->specialInterval > 0)left = cursor - this->specialInterval;
 	for (int i = left; i <= right; i++) {
-		if (items[i]->getHighValue() > items[cursor]->getHighValue())return false;
+		if (items[i]->close > items[cursor]->close)return false;
 	}
 	return true;
 }
@@ -35,7 +43,7 @@ bool KLine::isSpecialLow(KLine** items, int cursor, int dataLen)
 	if (cursor + this->specialInterval < dataLen)right = cursor + this->specialInterval;
 	if (cursor - this->specialInterval > 0)left = cursor - this->specialInterval;
 	for (int i = left; i <= right; i++) {
-		if (items[i]->getLowValue() < items[cursor]->getLowValue())return false;
+		if (items[i]->close < items[cursor]->close)return false;
 	}
 	return true;
 }
@@ -83,7 +91,7 @@ void PriceAnalyser::checkFx()
 				lastIndex = i;
 			}
 			else {
-				if (this->kLines[i]->vaildFx(this->kLines[lastIndex], lastType)) {
+				if (this->kLines[i]->vaildFx(this->kLines[lastIndex], lastType, this->kTypes[i])) {
 					lastType = this->kTypes[i];
 					lastIndex = i;
 				}
@@ -104,4 +112,13 @@ void PriceAnalyser::show()
 		if (i < dataLen - 1)std::cout << ",";
 	}
 	std::cout << "]" << std::endl;
+}
+
+
+float PriceAnalyser::calcDiff(int cursor, int cycle)
+{
+	int left = cursor - cycle > 0 ? cursor - cycle : 0, right = cursor > this->dataLen - 1 ? dataLen - 1 : cursor;
+	float sum = 0.f;
+	for (int i = left; i <= right; i++)sum += this->kLines[i]->getClose();
+	return sum;
 }
