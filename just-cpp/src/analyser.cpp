@@ -122,3 +122,11 @@ float PriceAnalyser::calcDiff(int cursor, int cycle)
 	for (int i = left; i <= right; i++)sum += this->kLines[i]->getClose();
 	return sum;
 }
+
+std::tuple<int, bool> PriceAnalyser::getFx(FxType type, int cycle)
+{
+	for (int i = this->dataLen - 1; i > this->dataLen - 1 - cycle; i--) {
+		if (this->kTypes[i] == type)return std::tuple<int, bool>(i, true);
+	}
+	return std::tuple<int, bool>(0, false);
+}

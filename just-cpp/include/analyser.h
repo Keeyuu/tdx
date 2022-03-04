@@ -1,5 +1,6 @@
 #pragma once
 #include<algorithm>
+#include<tuple>
 #ifndef ANALYSER_H
 #define ANALYSER_H
 
@@ -30,6 +31,7 @@ class PriceAnalyser
 	void checkFx();
 public:
 	float calcDiff(int, int);
+	std::tuple<int, bool> getFx(FxType, int);
 	void show();
 	PriceAnalyser(int, float*, float*, float*);
 	~PriceAnalyser();
