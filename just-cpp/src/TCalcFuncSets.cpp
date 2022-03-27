@@ -29,8 +29,6 @@ bool isSpecialHigh(int dataLen, float* close, int cursor, int specialInterval)
 	for (int i = left; i < cursor && i < dataLen; i++) {
 		if (close[i] > close[cursor]) return false;
 	}
-	//todo 寻找底分型 
-	//todo 找到周期内第一根最高点
 	return true;
 }
 
