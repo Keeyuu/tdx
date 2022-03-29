@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TCalcFuncSets.h"
-
+typedef void(*func)(int dataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc);
 // a: diff ma5 b: open c: close
 void OverfulfilPatter(int dataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
@@ -18,7 +18,13 @@ void OverfulfilPatter(int dataLen, float* pfOUT, float* pfINa, float* pfINb, flo
 	//if (true);//todo Ò»ÐÇ
 	//if (true);//todo ¶þÐÇ
 	//if (true);//todo ÈýÐÇ
-	//for (int i = 0; i < dataLen; i++) pfOUT[i] = flag;
+	HMODULE hDll = LoadLibrary(L"test.dll");
+	auto fn = (func)GetProcAddress(hDll, "test");
+	if (fn != nullptr)
+	{
+		fn(dataLen, pfOUT, pfINa, pfINb, pfINc);
+	}
+	FreeLibrary(hDll);
 }
 
 
@@ -68,4 +74,7 @@ void Debug()
 	x.show();
 
 	std::cout << "end debug" << std::endl;
+	for (int i = 0; i < max; i++)std::cout << p[i] << std::endl;
+	OverfulfilPatter(max, p, p, p, p);
+	for (int i = 0; i < max; i++)std::cout << p[i] << std::endl;
 }
