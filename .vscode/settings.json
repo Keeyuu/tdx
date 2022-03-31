@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "ios": "cpp",
+        "xiosbase": "cpp",
+        "system_error": "cpp"
+    }
+}

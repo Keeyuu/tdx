@@ -5,6 +5,7 @@
 
 
 #define PLUGIN_EXPORTS
+#define INIT -1
 #pragma warning(disable:4996)
 
 
@@ -57,46 +58,74 @@ void GetCopyRightInfo(LPPLUGIN info)
 	info->ParamInfo[1].nDefault = 10;
 }
 
+const	BYTE	g_nAvoidMask[] = { 0xF8, 0xF8, 0xF8, 0xF8 };	// 无效数据标志(系统定义)
 
-const	BYTE	g_nAvoidMask[] = { 0xF8,0xF8,0xF8,0xF8 };	// 无效数据标志(系统定义)
-
-
-WORD   AfxRightData(float* pData, WORD nMaxData)	//获取有效数据位置
+WORD   AfxRightData(LPHISDAT pData, WORD nMaxData)	//获取有效数据位置
 {
-	for (WORD nIndex = 0; nIndex < nMaxData && !memcmp(&pData[nIndex], g_nAvoidMask, 4); nIndex++)return nIndex;
+	for (WORD nIndex = 0; nIndex < nMaxData && !memcmp(&pData[nIndex].Close, g_nAvoidMask, 4); nIndex++)return nIndex;
 }
 
-BOOL InputInfoThenCalc1(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused) //按最近数据计算
+int findUltra(LPHISDAT in, int times, int left, int index)
 {
-	BOOL nRet = FALSE;
+	//允许调整三日 
+	//0 1 2 3 4 5 
+	int len = 10;//10日最高
+	if (times > 3 || index < left)return INIT;
+	int start = index - len > left ? index - len : left;
+	for (int i = start; i < index; i++)
+	{
+		if (in[i].Close > in[index].Close)return findUltra(in, times + 1, left, index - 1);
+	}
+	return index;
+}
+
+
+int FindUltra(LPHISDAT in, int left, int right)
+{
+	return findUltra(in, 0, left, right);
+}
+
+
+bool CheckDayLevel(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused)
+{
+	BOOL nRet = false;
 	NTime tmpTime = { 0 };
 
 	LPHISDAT pHisDat = new HISDAT[nDataNum];  //数据缓冲区
 	long readnum = g_pFuncCallBack(Code, nSetCode, PER_DAY, pHisDat, nDataNum, tmpTime, tmpTime, nTQ, 0);  //利用回调函数申请数据，返回得到的数据个数
 	if (readnum > max(Value[0], Value[1])) //只有数据个数大于Value[0]和Value[1]中的最大值才有意义
 	{
-		/*	float* pMa1 = new float[readnum];
-			float* pMa2 = new float[readnum];
-			for (int i = 0; i < readnum; i++)
-			{
-				pMa1[i] = pHisDat[i].Close;
-				pMa2[i] = pHisDat[i].Close;
-			}*/
-			//auto x = AfxRightData(pMa1, readnum);
-		if (pHisDat[readnum - 1].Close > 100 && pHisDat[readnum - 1].Close < 200) {
-			nRet = TRUE;
-		}
+		int left = AfxRightData(pHisDat, readnum);
+		int flag = FindUltra(pHisDat, left, readnum);
+		if (flag != INIT)nRet = true;
 	}
 
 	delete[]pHisDat; pHisDat = NULL;
 	return nRet;
 }
 
-BOOL InputInfoThenCalc2(char* Code, short nSetCode, int Value[4], short DataType, NTime time1, NTime time2, BYTE nTQ, unsigned long unused)  //选取区段
+
+bool CheckBreakthrough(LPHISDAT in, int len, int right)
 {
+	int start = right - len < 0 ? 0 : right - len;
+	for (int i = start; i < right; i++)
+	{
+		if (in[i].Close > in[right].Close)return false;
+	}
 	return true;
 }
 
+
+
+BOOL InputInfoThenCalc1(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused) //按最近数据计算
+{
+	return CheckDayLevel(Code, nSetCode, Value, DataType, nDataNum, nTQ, unused);
+}
+
+BOOL InputInfoThenCalc2(char* Code, short nSetCode, int Value[4], short DataType, NTime time1, NTime time2, BYTE nTQ, unsigned long unused)  //选取区段
+{
+	return false;
+}
 
 
 
