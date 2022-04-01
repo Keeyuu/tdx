@@ -85,6 +85,18 @@ int FindUltra(LPHISDAT in, int left, int right)
 	return findUltra(in, 0, 0, right);
 }
 
+float CalcMa(LPHISDAT in, int left, int right, int len)
+{
+	float value = 0, times = 0;
+	int start = right - len > left ? right - len : left;
+	for (int i = start; i < right; i++)
+	{
+		value += in[i].Close;
+		times++;
+	}
+	return value / times;
+}
+
 
 bool CheckDayLevel(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused)
 {
@@ -97,7 +109,13 @@ bool CheckDayLevel(char* Code, short nSetCode, int Value[4], short DataType, sho
 	{
 		int left = AfxRightData(pHisDat, readnum);
 		int flag = FindUltra(pHisDat, left, readnum);
-		if (flag != INIT)nRet = true;
+		if (flag != INIT)
+		{
+			//ma5过滤
+			if (pHisDat[flag].Close >= CalcMa(pHisDat, 0, flag, 5))nRet = true;
+			//至少拉出10日平均区间一半
+
+		}
 	}
 
 	delete[]pHisDat; pHisDat = NULL;
