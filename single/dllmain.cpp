@@ -70,7 +70,7 @@ int findUltra(LPHISDAT in, int times, int left, int index)
 	//允许调整三日 
 	//0 1 2 3 4 5 
 	int len = 10;//10日最高
-	if (times > 3 || index < left)return INIT;
+	if (times > 3 || index <= left)return INIT;
 	int start = index - len > left ? index - len : left;
 	for (int i = start; i < index; i++)
 	{
@@ -82,7 +82,7 @@ int findUltra(LPHISDAT in, int times, int left, int index)
 
 int FindUltra(LPHISDAT in, int left, int right)
 {
-	return findUltra(in, 0, left, right);
+	return findUltra(in, 0, 0, right);
 }
 
 
