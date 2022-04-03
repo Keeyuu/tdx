@@ -48,10 +48,10 @@ void GetCopyRightInfo(LPPLUGIN info)
 	strcpy(info->OtherInfo, "自定义参数待完善");
 	//填写参数信息
 	info->ParamNum = 2;
-	strcpy(info->ParamInfo[0].acParaName, "待完善1");
+	strcpy(info->ParamInfo[0].acParaName, "n日新高");
 	info->ParamInfo[0].nMax = 1;
 	info->ParamInfo[0].nMax = 1000;
-	info->ParamInfo[0].nDefault = 51;
+	info->ParamInfo[0].nDefault = 10;
 	strcpy(info->ParamInfo[1].acParaName, "待完善2");
 	info->ParamInfo[1].nMax = 1;
 	info->ParamInfo[1].nMax = 1000;
@@ -65,24 +65,23 @@ WORD   AfxRightData(LPHISDAT pData, WORD nMaxData)	//获取有效数据位置
 	for (WORD nIndex = 0; nIndex < nMaxData && !memcmp(&pData[nIndex].Close, g_nAvoidMask, 4); nIndex++)return nIndex;
 }
 
-int findUltra(LPHISDAT in, int times, int left, int index)
+int findUltra(LPHISDAT in, int times, int left, int index, int len)
 {
 	//允许调整三日 
 	//0 1 2 3 4 5 
-	int len = 10;//10日最高
 	if (times > 3 || index <= left)return INIT;
 	int start = index - len > left ? index - len : left;
 	for (int i = start; i < index; i++)
 	{
-		if (in[i].Close > in[index].Close)return findUltra(in, times + 1, left, index - 1);
+		if (in[i].High > in[index].High)return findUltra(in, times + 1, left, index - 1, len);
 	}
 	return index;
 }
 
 
-int FindUltra(LPHISDAT in, int left, int right)
+int FindUltra(LPHISDAT in, int left, int right, int len)
 {
-	return findUltra(in, 0, 0, right);
+	return findUltra(in, 0, 0, right, len);
 }
 
 float CalcMa(LPHISDAT in, int left, int right, int len)
@@ -97,25 +96,28 @@ float CalcMa(LPHISDAT in, int left, int right, int len)
 	return value / times;
 }
 
-
-bool CheckDayLevel(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused)
+bool CheckLow(LPHISDAT in, int flag, int right)
 {
-	BOOL nRet = false;
-	NTime tmpTime = { 0 };
-
-	LPHISDAT pHisDat = new HISDAT[nDataNum];  //数据缓冲区
-	long readnum = g_pFuncCallBack(Code, nSetCode, PER_DAY, pHisDat, nDataNum, tmpTime, tmpTime, nTQ, 0);  //利用回调函数申请数据，返回得到的数据个数
-	if (readnum > max(Value[0], Value[1])) //只有数据个数大于Value[0]和Value[1]中的最大值才有意义
+	//直接跳上跳空阴线
+	for (int i = flag; i < right; i++)
 	{
-		int left = AfxRightData(pHisDat, readnum);
-		int flag = FindUltra(pHisDat, left, readnum);
-		if (flag != INIT)
-		{
-			//ma5过滤
-			if (pHisDat[flag].Close >= CalcMa(pHisDat, 0, flag, 5))nRet = true;
-			//至少拉出10日平均区间一半
+		if (in[i].Low < in[flag].Open)return false;
+	}
+	return true;
+}
 
-		}
+bool CheckDayLevel(LPHISDAT pHisDat, int readnum, int Value[4])
+{
+	bool nRet = false;
+	int left = AfxRightData(pHisDat, readnum);
+	int flag = FindUltra(pHisDat, left, readnum, Value[0]);
+	if (flag != INIT)
+	{
+		//ma5过滤 //回调最低点过滤
+		if (pHisDat[flag].Close >= CalcMa(pHisDat, 0, flag, 5) * 1.02 && (CheckLow(pHisDat, flag, readnum)))nRet = true;
+		//至少拉出10日平均区间一半
+
+
 	}
 
 	delete[]pHisDat; pHisDat = NULL;
@@ -137,12 +139,19 @@ bool CheckBreakthrough(LPHISDAT in, int len, int right)
 
 BOOL InputInfoThenCalc1(char* Code, short nSetCode, int Value[4], short DataType, short nDataNum, BYTE nTQ, unsigned long unused) //按最近数据计算
 {
-	return CheckDayLevel(Code, nSetCode, Value, DataType, nDataNum, nTQ, unused);
+	NTime tmpTime = { 0 };
+	LPHISDAT pHisDat = new HISDAT[nDataNum];  //数据缓冲区
+	long readnum = g_pFuncCallBack(Code, nSetCode, PER_DAY, pHisDat, nDataNum, tmpTime, tmpTime, nTQ, 0);  //利用回调函数申请数据，返回得到的数据个数
+	return CheckDayLevel(pHisDat, readnum, Value);
 }
 
 BOOL InputInfoThenCalc2(char* Code, short nSetCode, int Value[4], short DataType, NTime time1, NTime time2, BYTE nTQ, unsigned long unused)  //选取区段
 {
-	return false;
+	//窥视数据个数
+	long datanum = g_pFuncCallBack(Code, nSetCode, DataType, NULL, -1, time1, time2, nTQ, 0);
+	LPHISDAT pHisDat = new HISDAT[datanum];
+	long readnum = g_pFuncCallBack(Code, nSetCode, DataType, pHisDat, datanum, time1, time2, nTQ, 0);
+	return CheckDayLevel(pHisDat, readnum, Value);
 }
 
 
